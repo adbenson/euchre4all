@@ -1,14 +1,12 @@
-import { getData } from "@/db/db";
+import Link from "next/link";
 
-export default async function Home() {
-	const data = await getData();
+export default function HomePage() {
 	return (
 		<div>
 			Euchre 4 All!
 
-			<pre>
-				{JSON.stringify(data, null, 2)}
-			</pre>
+			<Link href="/new">New Game</Link>
+			<Link href="/join">Join Game</Link>
 		</div>
 	);
 }
