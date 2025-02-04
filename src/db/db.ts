@@ -1,6 +1,7 @@
 import { ENV } from "@/env";
 import { Team } from "@/game/models/game-state";
 import { neon, NeonQueryFunction, Pool } from "@neondatabase/serverless";
+import { randomBytes } from "crypto";
 import { generateGameCode } from "./utils";
 
 export enum ERRORS {
@@ -60,11 +61,12 @@ export async function insertPlayerIfNotFull(gameCode: string, playerName: string
 
 		const position = rows.length + 1;
 		const team = position % 2 === 0 ? Team.A : Team.B;
-		const clientId = crypto.randomUUID();
 
+		const playerToken = randomBytes(64).toString('base64');
+console.log("PTL", playerToken.length);
 		const {rows: [player]} = await pool.query(
-			`INSERT INTO players (name, team, position, client_id) VALUES ($1, $2, $3, $4, $5) RETURNING id;`,
-			[playerName, team, position, clientId]
+			`INSERT INTO players (name, team, position, player_token) VALUES ($1, $2, $3, $4, $5) RETURNING id;`,
+			[playerName, team, position, playerToken]
 		);
 
 		await pool.query(
@@ -76,7 +78,7 @@ export async function insertPlayerIfNotFull(gameCode: string, playerName: string
 
 		console.debug('Player joined game', gameCode, playerName);
 
-		return clientId;
+		return playerToken;
 	} catch (err) {
 		await pool.query('ROLLBACK');
 		throw new Error(ERRORS.DB_ERROR, {cause: err});

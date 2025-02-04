@@ -1,20 +1,19 @@
 'use client';
 import { addPlayer, createGame } from '@/api-client/client';
-import { setClientId } from '@/game/clientId';
+import { setPlayerToken } from '@/api-client/playerToken';
 import { useRouter } from 'next/navigation';
-import { ChangeEventHandler, FormEventHandler, useState } from 'react';
+import { ChangeEventHandler, FormEventHandler, ReactNode, useState } from 'react';
 
-export default function NewGamePage() {
+export default function NewGamePage(): ReactNode {
 	const [name, setName] = useState('');
 	const [isDirty, setIsDirty] = useState(false);
 	const router = useRouter();
 
 	const startGame = async () => {
-
 		const code = await createGame();
-		const clientId = await addPlayer(code, name);
-		setClientId(clientId);
-		router.push('/game?' + new URLSearchParams({ code }).toString());
+		const token = await addPlayer(code, name);
+		setPlayerToken(token);
+		router.push(`/game/${code}`);
 	}
 
 	const onSubmit: FormEventHandler = (e) => {
