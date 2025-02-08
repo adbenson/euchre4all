@@ -38,8 +38,8 @@ export async function insertNewGame(): Promise<string> {
 	return code;
 }
 
-export async function insertPlayerIfNotFull(gameCode: string, playerName: string): Promise<string> {
-	console.debug('Player joining game', gameCode, playerName);
+export async function insertPlayerIfNotFull(playerName: string, gameCode: string): Promise<string> {
+	console.debug('Player joining game', playerName, gameCode);
 
 	const pool = createPool();
 
@@ -76,7 +76,7 @@ console.log("PTL", playerToken.length);
 
 		await pool.query('COMMIT');
 
-		console.debug('Player joined game', gameCode, playerName);
+		console.debug('Player joined game', playerName, gameCode);
 
 		return playerToken;
 	} catch (err) {

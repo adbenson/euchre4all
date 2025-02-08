@@ -1,46 +1,26 @@
-'use client';
-import { addPlayer, createGame } from '@/api-client/client';
-import { setPlayerToken } from '@/api-client/playerToken';
-import { useRouter } from 'next/navigation';
-import { ChangeEventHandler, FormEventHandler, ReactNode, useState } from 'react';
+import { insertNewGame } from '@/db/db';
+import { JoinGameForm } from '@/game/components/JoinGameForm';
+import { redirect } from 'next/navigation';
+import { ReactNode } from 'react';
+import { joinGame } from '../join/actions';
+import { setPlayerToken } from '../playerToken';
 
-export default function NewGamePage(): ReactNode {
-	const [name, setName] = useState('');
-	const [isDirty, setIsDirty] = useState(false);
-	const router = useRouter();
+export default async function NewGamePage(): Promise<ReactNode> {
 
-	const startGame = async () => {
-		const code = await createGame();
-		const token = await addPlayer(code, name);
-		setPlayerToken(token);
-		router.push(`/game/${code}`);
-	}
-
-	const onSubmit: FormEventHandler = (e) => {
-		e.preventDefault();
-		setIsDirty(true);
-		if (name) {
-			startGame();
-		}
-		return false;
-	}
-
-	const onChange: ChangeEventHandler<HTMLInputElement> = (e) => {
-		setName(e.target.value);
-		setIsDirty(true);
+	const startAndJoinGame = async (playerName: string) => {
+		'use server';
+		const gameCode = await insertNewGame();
+		console.info("New game created", gameCode);
+		const playerToken = await joinGame(playerName, gameCode);
+		console.info("Player joined, token: ...", playerToken.substring(playerToken.length - 4));
+		setPlayerToken(playerToken);
+		redirect(`/game/${gameCode}`);
 	}
 
 	return (
-		<form onSubmit={onSubmit} className={isDirty ? 'dirty' : ''}>
-			<input
-				type="text"
-				required={true}
-				placeholder='Enter your name'
-				value={name}
-				onChange={onChange}
-			/>
-
-			<button disabled={!name}>Start Game</button>
-		</form>
+		<>
+			<h1>New Game</h1>
+			<JoinGameForm submit={startAndJoinGame}/>
+		</>
 	)
 };

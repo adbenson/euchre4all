@@ -1,4 +1,4 @@
-import { Cards, codeToCard } from "@/game/models/card-models";
+import { codeToCard } from "@/game/models/card-models";
 import { GameState, initialState, initialTableState, PlayerAction, TableState } from "@/game/models/game-state";
 import { Message } from "ably";
 import { useChannel } from "ably/react";
@@ -47,13 +47,12 @@ const tableStateFromDto = (dto: TableStateDto): TableState => {
 	};
 }
 
-export const useGameState = (): UseGameStateReturn => {
+export const useGameState = (gameCode: string): UseGameStateReturn => {
 
 	const [gameState, setGameState] = useState<GameState>(initialState);
 	const [tableState, setTableState] = useState<TableState>(initialTableState);
-	const [playerHand, setPlayerHand] = useState<Cards>([]);
 
-	useChannel(GAME_STATE_CHANNEL, (message: GameStateMessage) => {
+	useChannel(`${GAME_STATE_CHANNEL}:${gameCode}`, (message: GameStateMessage) => {
 		if (message.data) {
 			setGameState(message.data.gameState);
 			setTableState(tableStateFromDto(message.data.tableState));

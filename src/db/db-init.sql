@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS players (
 	position smallint NOT NULL,
 	team_name character(1) NOT NULL,
 	name character varying(255) NOT NULL,
-	client_id uuid NOT NULL UNIQUE,
+	player_token character(64) NOT NULL UNIQUE,
 	PRIMARY KEY (id),
 	FOREIGN KEY (team_name) REFERENCES teams (name)
 );

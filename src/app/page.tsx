@@ -1,6 +1,8 @@
 import Link from "next/link";
 
 export default function HomePage() {
+	console.debug("Home page requested");
+
 	return (
 		<div>
 			<h1>Euchre 4 All!</h1>
